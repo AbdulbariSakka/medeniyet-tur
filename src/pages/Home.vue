@@ -4,7 +4,7 @@
     <hr class="q-my-lg">
     <q-table
       flat
-      :rows="rows"
+      :rows="rows1"
       :columns="columns"
       row-key="id"
       :filter="filter"
@@ -51,30 +51,25 @@
 <script>
 const columns = [
   {
-    name: 'name',
+    name: 'image',
     required: true,
-    label: 'Dessert (100g serving)',
-    align: 'left',
-    field: row => row.name,
+    label: 'Image',
+    align: 'center',
+    field: row => row.image,
     format: val => `${val}`,
     sortable: true
   },
-  { name: 'calories', align: 'center', label: 'Calories', field: 'calories', sortable: true },
-  { name: 'fat', label: 'Fat (g)', field: 'fat', sortable: true },
-  { name: 'carbs', label: 'Carbs (g)', field: 'carbs' },
-  { name: 'protein', label: 'Protein (g)', field: 'protein' },
-  { name: 'sodium', label: 'Sodium (mg)', field: 'sodium' },
-  { name: 'calcium', label: 'Calcium (%)', field: 'calcium', sortable: true, sort: (a, b) => parseInt(a, 10) - parseInt(b, 10) },
-  { name: 'iron', label: 'Iron (%)', field: 'iron', sortable: true, sort: (a, b) => parseInt(a, 10) - parseInt(b, 10) },
+  { name: 'date', align: 'center', label: 'Date', field: row => row.date, sortable: true },
+  { name: 'description', label: 'Description', field: row => row.description, sortable: true },
+  { name: 'price', label: 'Price', field: row => row.price, sortable: true },
   {
     name: "actions",
-    align: "right",
+    align: "center",
     label: "Actions",
-    field: "actions",
-    sortable: true,
+    field: "actions"
   },
 ]
-
+/*
 const originalRows = [
   {
     name: 'Frozen Yogurt',
@@ -177,8 +172,10 @@ const originalRows = [
     calcium: '12%',
     iron: '6%'
   }
-]
+]*/
+
 import { defineComponent  , ref} from 'vue';
+import axios from 'axios';
 
 export default defineComponent({
   name: 'PageIndex',
@@ -186,11 +183,21 @@ export default defineComponent({
     const loading = ref(false)
     const filter = ref('')
     const rowCount = ref(10)
-    const rows = ref([...originalRows])
-
+    //const rows = ref([...originalRows])
+    const rows1 = ref([]);
+    const getTurs = () => {
+      axios({
+        url: "http://localhost:58854/api/tur", 
+        method: "GET"
+      }).then((res) => {
+        rows1.value = res.data
+        console.log(rows1.value)
+      })
+    };
+    getTurs();
     return {
       columns,
-      rows,
+      rows1,
 
       loading,
       filter,
