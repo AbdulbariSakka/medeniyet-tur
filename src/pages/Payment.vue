@@ -30,7 +30,7 @@
                         />
                         <q-input
                             class="col-12 col-md-5"
-                            v-model="bornDate"
+                            v-model="birthDate"
                             type="date"
                             lazy-rules
                             :rules="[ val => val && val.length > 0 || 'Please type your born date']"
@@ -116,6 +116,7 @@
 <script>
 import { useQuasar } from 'quasar'
 import { ref } from 'vue'
+import axios from 'axios'
 
 export default {
     setup() {
@@ -123,9 +124,10 @@ export default {
 
         const name = ref(null);
         const surname = ref(null);
-        const bornDate = ref(null);
+        const birthDate = ref(null);
         const email = ref(null);
         const tcNumber = ref(null);
+        const phoneNumber = ref(null);
 
         const accept = ref(false);
         const acceptNotifications = ref(false);
@@ -136,14 +138,14 @@ export default {
         const cvv = ref(null);
         const cardNumber = ref(null);
         const cardFullName = ref(null);
-
+        
         const months = [
             '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'
         ]
         const years = [
             '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33'
         ]
-
+        
         const onSubmit = () => {
             if (accept.value !== true) {
             $q.notify({
@@ -154,13 +156,35 @@ export default {
             })
             }
             else {
-            $q.notify({
-                color: 'green-4',
-                textColor: 'white',
-                icon: 'cloud_done',
-                message: 'Submitted'
-            })
+                axios({
+                url:"http://localhost:58854/api/payment",
+                method: 'post', 
+                headers: { 'Accept': 'application/json', 'Content-Type': 'application/form-data' },
+                data:{
+                    id: 3,
+                    name,
+                    surname,
+                    birthDate,
+                    email,
+                    tcNumber,
+                    phoneNumber
+                }
+                });
             }
+            /*if (name.value !== 0 && surname.value !== 0 && birthDate.value && email.value
+                && tcNumber.value && month.value && year.value && cvv.value && cardNumber.value
+                && cardFullName.value && accept.value !== true){
+                $q.notify({
+                    color: 'red-5',
+                    textColor: 'white',
+                    icon: 'warning',
+                    message: 'please enter your complete information'
+                })
+
+            }
+            else {
+                sendInfo();
+            }*/
         };
 
         const onReset = () => {
@@ -172,9 +196,11 @@ export default {
         return{
             name,
             surname,
-            bornDate,
+            birthDate,
             email,
             tcNumber,
+            phoneNumber,
+
             accept,
             acceptNotifications,
 
