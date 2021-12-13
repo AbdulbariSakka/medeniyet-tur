@@ -51,6 +51,13 @@
                             maxlength="100"
                             :rules="[ val => val && val.length > 0 || 'Please type tur description']"
                         />
+                        <!--<div class="col-12">
+                            <q-img
+                            :src="imageUrl"
+                            :ratio="1"
+                            />
+                        </div>
+                        -->
                         <q-input
                             @update:model-value="val => { file = val[0] }"
                             filled
@@ -86,9 +93,29 @@ export default {
         const file = ref(null);
         const desc = ref(null);
         const history = ref(null);
-
+        const id = ref(null);
+        const image = ref(null);
         const accept = ref(false);
-        
+
+        //const imageUrl = ref(null);
+        const getId = () => {
+            id.value = localStorage.getItem("id");
+            const getTur = () => {
+                axios({
+                    url: "http://localhost:58854/api/tur/" + id.value, 
+                    method: "GET"
+                }).then((res) => {
+                    name.value = res.data.name;
+                    price.value = res.data.price;
+                    desc.value = res.data.description;
+                    history.value = res.data.date;
+                    image.value = res.data.image;
+                    //imageUrl.value = "http://localhost:58854/image/"+ image.value;
+                })
+            };
+            getTur();
+        }
+        getId();
 
         const onSubmit = () => {
                 const formData = new FormData();
@@ -97,10 +124,16 @@ export default {
                 formData.append('Price', price.value);
                 formData.append('Date', history.value);
                 formData.append('Description' , desc.value);
+                formData.append('Id' , id.value);
+                if(file.value === null){
+                    formData.append('Image' , image.value);
+                }
+                
+
                 const headers = { 'Content-Type': 'multipart/form-data' };
                 axios({
                 url:"http://localhost:58854/api/tur",
-                method: 'post', 
+                method: 'put', 
                 headers: headers,
                 data: formData
                 });
@@ -114,6 +147,7 @@ export default {
             history,
             accept,
             file,
+            //imageUrl,
 
             onSubmit
         }

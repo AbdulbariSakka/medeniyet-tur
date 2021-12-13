@@ -22,13 +22,15 @@
               round
               color="primary"
               icon="edit"
-              to="/new"
+              to="/edit"
+              @click="editTur(props.row.id)"
             />
             <q-btn
               round
               color="deep-orange"
               glossy
               icon="delete"
+              @click="deleteTur(props.row.id)"
             />
           </div>
         </q-td>
@@ -51,11 +53,11 @@
 <script>
 const columns = [
   {
-    name: 'image',
+    name: 'name',
     required: true,
-    label: 'Image',
+    label: 'name',
     align: 'center',
-    field: row => row.image,
+    field: row => row.name,
     format: val => `${val}`,
     sortable: true
   },
@@ -195,6 +197,21 @@ export default defineComponent({
       })
     };
     getTurs();
+
+    const deleteTur = (id) =>{
+      axios({
+        url: "http://localhost:58854/api/tur?id=" + id, 
+        method: "DELETE"
+      })
+      console.log(id);
+      const index = rows1.value.find(x => x.id == id)
+      rows1.value.splice(index, 1);
+    }
+
+    const editTur = (id) => {
+      localStorage.setItem("id" , id);
+    }
+
     return {
       columns,
       rows1,
@@ -202,6 +219,9 @@ export default defineComponent({
       loading,
       filter,
       rowCount,
+
+      deleteTur,
+      editTur
     }
   }
 })

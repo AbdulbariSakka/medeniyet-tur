@@ -3,7 +3,6 @@
         <div class="q-pa-md">
             <q-form
             @submit="onSubmit"
-            @reset="onReset"
             class="q-gutter-md"
             >
             <div class="row q-gutter-md">
@@ -105,7 +104,6 @@
 
             <div class="q-mx-lg">
                 <q-btn label="Submit" type="submit" color="primary" />
-                <q-btn label="Reset" type="reset" color="primary" class="q-ml-sm"/>
             </div>
             </q-form>
 
@@ -159,40 +157,18 @@ export default {
                 axios({
                 url:"http://localhost:58854/api/payment",
                 method: 'post', 
-                headers: { 'Accept': 'application/json', 'Content-Type': 'application/form-data' },
+                headers: {},
                 data:{
-                    id: 3,
-                    name,
-                    surname,
-                    birthDate,
-                    email,
-                    tcNumber,
-                    phoneNumber
+                    "Name": name.value,
+                    "Surname": surname.value,
+                    "BirthDate": birthDate.value,
+                    "Email": email.value,
+                    "Tc": tcNumber.value,
+                    "PhoneNumber": phoneNumber.value
                 }
                 });
             }
-            /*if (name.value !== 0 && surname.value !== 0 && birthDate.value && email.value
-                && tcNumber.value && month.value && year.value && cvv.value && cardNumber.value
-                && cardFullName.value && accept.value !== true){
-                $q.notify({
-                    color: 'red-5',
-                    textColor: 'white',
-                    icon: 'warning',
-                    message: 'please enter your complete information'
-                })
-
-            }
-            else {
-                sendInfo();
-            }*/
         };
-
-        const onReset = () => {
-            name.value = null
-            age.value = null
-            accept.value = false
-        }
-
         return{
             name,
             surname,
@@ -212,7 +188,6 @@ export default {
             years,
 
             onSubmit,
-            onReset
         }
     },
 }
