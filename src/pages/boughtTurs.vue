@@ -14,11 +14,12 @@
         <q-td :props="props">
           <div class="q-gutter-xs">
             <q-btn
-              color="primary"
-              label="Satın Al"
-              :to="'/payment/' + props.row.id"
+              round
+              color="deep-orange"
+              glossy
+              icon="delete"
+              @click="deletereq(props.row.id)"
             />
-            
           </div>
         </q-td>
       </template>
@@ -32,8 +33,33 @@
 
     </q-table>
     <div>
-      <q-btn label="My Turs" to="/bought" color="primary" />
+      <q-btn label="Back" to="/" color="primary" />
     </div>
+
+    <q-dialog v-model="confirm">
+      <q-card>
+        <q-card-section class="row items-center">
+          <span class="q-ml-sm">You really want to cancel this tur?</span>
+        </q-card-section>
+
+        <q-card-actions align="right">
+          <q-btn flat label="NO" color="green" v-close-popup />
+          <q-btn flat label="YES" color="deep-orange-14" @click="deleteTur()" v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
+    <q-dialog v-model="confirm1">
+      <q-card>
+        <q-card-section class="row items-center">
+          <span class="q-ml-sm">{{TurCanceled}}</span>
+        </q-card-section>
+
+        <q-card-actions align="right">
+          <q-btn flat label="OK" color="green" to="/" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
@@ -172,11 +198,16 @@ export default defineComponent({
     const loading = ref(false)
     const filter = ref('')
     const rowCount = ref(10)
-    //const rows = ref([...originalRows])
+    const confirm = ref(false)
+    const confirm1 = ref(false)
+    const Id = ref(null)
+
+    const TurCanceled = ref(null)
+//const rows = ref([...originalRows])
     const rows1 = ref([]);
     const getTurs = () => {
       axios({
-        url: "http://localhost:4000/api/tur", 
+        url: "http://localhost:4000/api/tur/getboughtturs", 
         method: "GET"
       }).then((res) => {
         rows1.value = res.data
@@ -185,6 +216,31 @@ export default defineComponent({
     };
     getTurs();
 
+    const deleteTur = () =>{
+      axios({
+        url: "http://localhost:4000/api/tur/canceltur/" + Id.value, 
+        method: "DELETE"
+      }).then((res) => {
+        if(res.status == 200){
+          const index = rows1.value.indexOf(rows1.value.find(x => x.id == Id.value))
+          console.log(index)
+          rows1.value.splice(index, 1);
+          confirm1.value = true
+          TurCanceled.value = "Tur canceled successfully"
+        }
+      })
+      .catch((err) => {
+        TurCanceled.value = "you can't cancel this tur"
+      })
+    }
+    const deletereq = (id) => {
+      confirm.value = true;
+      Id.value = id
+    }
+    const editTur = (id) => {
+      localStorage.setItem("id" , id);
+    }
+    
     return {
       columns,
       rows1,
@@ -192,6 +248,14 @@ export default defineComponent({
       loading,
       filter,
       rowCount,
+
+      deleteTur,
+      editTur,
+      deletereq,
+
+      TurCanceled,
+      confirm,
+      confirm1
     }
   }
 })

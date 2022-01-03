@@ -14,11 +14,19 @@
         <q-td :props="props">
           <div class="q-gutter-xs">
             <q-btn
+              round
               color="primary"
-              label="Satın Al"
-              :to="'/payment/' + props.row.id"
+              icon="edit"
+              to="/edit"
+              @click="editTur(props.row.id)"
             />
-            
+            <q-btn
+              round
+              color="deep-orange"
+              glossy
+              icon="delete"
+              @click="deleteTur(props.row.id)"
+            />
           </div>
         </q-td>
       </template>
@@ -32,7 +40,7 @@
 
     </q-table>
     <div>
-      <q-btn label="My Turs" to="/bought" color="primary" />
+      <q-btn label="New Tur" to="/new" color="primary" />
     </div>
   </q-page>
 </template>
@@ -185,6 +193,22 @@ export default defineComponent({
     };
     getTurs();
 
+    const deleteTur = (id) =>{
+      axios({
+        url: "http://localhost:4000/api/tur?id=" + id, 
+        method: "DELETE"
+      })
+      console.log(id);
+      const index = rows1.value.indexOf(rows1.value.find(x => x.id == id))
+      console.log(index)
+      rows1.value.splice(index, 1);
+      
+    }
+
+    const editTur = (id) => {
+      localStorage.setItem("id" , id);
+    }
+
     return {
       columns,
       rows1,
@@ -192,6 +216,9 @@ export default defineComponent({
       loading,
       filter,
       rowCount,
+
+      deleteTur,
+      editTur
     }
   }
 })

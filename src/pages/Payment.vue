@@ -106,7 +106,21 @@
                 <q-btn label="Submit" type="submit" color="primary" />
             </div>
             </q-form>
+            <q-dialog v-model="dialog" persistent transition-show="scale" transition-hide="scale">
+                 <q-card class="bg-teal text-white" style="width: 300px">
 
+
+                    <q-card-section>
+                        {{response}}
+                    </q-card-section>
+
+                <q-card-actions align="right" class="bg-white text-teal">
+                    <q-btn flat label="OK" to="/" v-if="response == 'Ödeme yapıldı'"/>
+                    <q-btn flat label="OK" v-close-popup v-else/>
+
+                </q-card-actions>
+                 </q-card>
+            </q-dialog>
         </div>
     </q-page>
 </template>
@@ -115,10 +129,16 @@
 import { useQuasar } from 'quasar'
 import { ref } from 'vue'
 import axios from 'axios'
+import { useRouter, useRoute } from 'vue-router'
 
 export default {
     setup() {
         const $q = useQuasar()
+        const router = useRouter()
+        const route = useRoute()
+        
+        const dialog = ref(false)
+        const response = ref(null)
 
         const name = ref(null);
         const surname = ref(null);
@@ -127,6 +147,7 @@ export default {
         const tcNumber = ref(null);
         const phoneNumber = ref(null);
 
+        console.log(route.params.id)
         const accept = ref(false);
         const acceptNotifications = ref(false);
 
@@ -155,7 +176,7 @@ export default {
             }
             else {
                 axios({
-                url:"http://localhost:58854/api/payment",
+                url:"http://localhost:4000/api/payment",
                 method: 'post', 
                 headers: {},
                 data:{
@@ -167,6 +188,32 @@ export default {
                     "PhoneNumber": phoneNumber.value
                 }
                 });
+
+                axios({
+                url:"http://localhost:4000/api/payment/pay1" ,
+                method: 'post', 
+                headers: {},
+                data:{
+                    "CardNumber": parseFloat(cardNumber.value),
+                    "FullName": cardFullName.value,
+                    "Month": parseFloat(month.value),
+                    "Year": parseFloat(year.value),
+                    "Cvv": parseFloat(cvv.value),
+                }
+                }).then((res) => {
+                    if(res.status === 200 || res.status === 204){
+                        dialog.value = true
+                        response.value = "Ödeme yapıldı"
+                    }
+                    else{
+                        dialog.value = true
+                        response.value = "Ödeme yapılmadı"
+                    }
+                });
+                axios({
+                    url:"http://localhost:4000/api/tur/buytur/" + route.params.id,
+                    method: 'get'
+                })
             }
         };
         return{
@@ -180,6 +227,8 @@ export default {
             accept,
             acceptNotifications,
 
+            month,
+            year,
             cvv,
             cardNumber,
             cardFullName,
@@ -187,6 +236,8 @@ export default {
             months,
             years,
 
+            response,
+            dialog,
             onSubmit,
         }
     },

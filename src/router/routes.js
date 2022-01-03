@@ -4,9 +4,11 @@ const routes = [
     component: () => import('layouts/MainLayout.vue'),
     children: [
       { path: '', component: () => import('src/pages/Home.vue') },
-      { path: '/payment', component: () => import('src/pages/Payment.vue') },
+      { path: '/payment/:id', component: () => import('src/pages/Payment.vue') },
       { path: '/new', component: () => import('src/pages/NewTur.vue') },
-      { path: '/edit', component: () => import('src/pages/Edit.vue') }
+      { path: '/edit', component: () => import('src/pages/Edit.vue') },
+      { path: '/admin', component: () => import('src/pages/Admin.vue') },
+      { path: '/bought', component: () => import('src/pages/boughtTurs.vue') }
 
     ]
   },

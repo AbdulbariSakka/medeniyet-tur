@@ -22,7 +22,7 @@
                         <q-input
                             class="col-12"
                             v-model="price"
-                            type="text"
+                            type="number"
                             label="Price *"
                             maxlength="50"
                             lazy-rules
@@ -55,6 +55,7 @@
                             @update:model-value="val => { file = val[0] }"
                             filled
                             type="file"
+                            required = 'required'
                         />
 
                     </div>
@@ -64,11 +65,28 @@
             <q-checkbox v-model="accept" label="Active tur" />
 
             <div class="q-mx-lg">
-                <q-btn label="Submit" type="submit" color="primary" />
+                <q-btn label="Submit" type="submit" color="primary" class="q-mr-md"/>
+                <q-btn label="Back" to="/admin" color="primary"/>
+
             </div>
             </q-form>
+            <q-dialog v-model="dialog" persistent transition-show="scale" transition-hide="scale">
+                 <q-card class="bg-teal text-white" style="width: 300px">
 
+
+                    <q-card-section>
+                        {{response}}
+                    </q-card-section>
+
+                <q-card-actions align="right" class="bg-white text-teal">
+                    <q-btn flat label="OK" to="/admin" v-if="response == 'Tur eklendi'"/>
+                    <q-btn flat label="OK" v-close-popup v-else/>
+
+                </q-card-actions>
+                 </q-card>
+            </q-dialog>
         </div>
+        
     </q-page>
 </template>
 
@@ -81,6 +99,8 @@ export default {
     setup() {
         const $q = useQuasar()
 
+        const dialog = ref(false)
+
         const name = ref(null);
         const price = ref(null);
         const file = ref(null);
@@ -89,22 +109,41 @@ export default {
 
         const accept = ref(false);
         
-
+        const response = ref(null)
+        const position = ref("top")
         const onSubmit = () => {
                 const formData = new FormData();
                 formData.append('ImageFile', file.value);
                 formData.append('Name', name.value);
-                formData.append('Price', price.value);
+                formData.append('Price', parseFloat(price.value));
                 formData.append('Date', history.value);
                 formData.append('Description' , desc.value);
                 const headers = { 'Content-Type': 'multipart/form-data' };
                 axios({
-                url:"http://localhost:58854/api/tur",
+                url:"http://localhost:4000/api/tur",
                 method: 'post', 
                 headers: headers,
                 data: formData
-                });
-            
+                }).then((res) => {
+                    if(res.status === 200 || res.status === 204){
+                        dialog.value = true
+                        response.value = "Tur eklendi"
+                    }
+                    else{
+                        dialog.value = true
+                        response.value = "Tur eklenmedi"
+                    }
+                })
+
+            const onReset = () => {
+                name.value = null
+                        price.value = null
+                        file.value = null
+                        desc.value = null
+                        history.value = null
+                        accept.value = false
+            }    
+
         };
 
         return{
@@ -114,6 +153,10 @@ export default {
             history,
             accept,
             file,
+
+            response,
+            position,
+            dialog,
 
             onSubmit
         }

@@ -26,7 +26,7 @@
                             label="Price *"
                             maxlength="50"
                             lazy-rules
-                            :rules="[ val => val && val.length > 0 || 'Please type tur price']"
+                            :rules="[ price => price && price > 0 || 'Please type tur price']"
                         />
                         <q-input
                             class="col-12"
@@ -62,6 +62,7 @@
                             @update:model-value="val => { file = val[0] }"
                             filled
                             type="file"
+                            required = 'required'
                         />
 
                     </div>
@@ -74,7 +75,21 @@
                 <q-btn label="Submit" type="submit" color="primary" />
             </div>
             </q-form>
+            <q-dialog v-model="dialog" persistent transition-show="scale" transition-hide="scale">
+                 <q-card class="bg-teal text-white" style="width: 300px">
 
+
+                    <q-card-section>
+                        {{response}}
+                    </q-card-section>
+
+                <q-card-actions align="right" class="bg-white text-teal">
+                    <q-btn flat label="OK" to="/admin" v-if="response == 'Tur düzeltildi'"/>
+                    <q-btn flat label="OK" v-close-popup v-else/>
+
+                </q-card-actions>
+                 </q-card>
+            </q-dialog>
         </div>
     </q-page>
 </template>
@@ -87,6 +102,9 @@ import axios from 'axios'
 export default {
     setup() {
         const $q = useQuasar()
+
+        const dialog = ref(null);
+        const response = ref(null);
 
         const name = ref(null);
         const price = ref(null);
@@ -102,7 +120,7 @@ export default {
             id.value = localStorage.getItem("id");
             const getTur = () => {
                 axios({
-                    url: "http://localhost:58854/api/tur/" + id.value, 
+                    url: "http://localhost:4000/api/tur/" + id.value, 
                     method: "GET"
                 }).then((res) => {
                     name.value = res.data.name;
@@ -132,10 +150,19 @@ export default {
 
                 const headers = { 'Content-Type': 'multipart/form-data' };
                 axios({
-                url:"http://localhost:58854/api/tur",
+                url:"http://localhost:4000/api/tur",
                 method: 'put', 
                 headers: headers,
                 data: formData
+                }).then((res) => {
+                    if(res.status === 200 || res.status === 204){
+                        dialog.value = true
+                        response.value = "Tur düzeltildi"
+                    }
+                    else{
+                        dialog.value = true
+                        response.value = "Tur eklenmedi"
+                    }
                 });
             
         };
@@ -149,6 +176,8 @@ export default {
             file,
             //imageUrl,
 
+            dialog,
+            response,
             onSubmit
         }
     },
